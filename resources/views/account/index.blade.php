@@ -22,6 +22,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Email</th>
+                        <th>Password</th>
                         <th>Category</th>
                         <th>Actions</th>
                     </tr>
@@ -41,9 +42,10 @@
             serverSide: true,
             ajax: '{{ route('account.index') }}',
             columns: [
-                {data: 'id', name: 'id'},
+                { data: 'id', name: 'id'},
                 { data: 'email', name: 'email' },
-                {data: 'category', name: 'category'},
+                { data: 'password', name: 'password' },
+                { data: 'category', name: 'category' },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
             ]
         });

@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // category
     Route::resource('category', CategoryController::class);
     Route::resource('account', AccountController::class);
+    Route::get('account/{account}/view-password', [AccountController::class, 'viewPassword'])->name('account.view-password');
 
 });
 

@@ -22,8 +22,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/responsive.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/file-input.css') }}">
     
-    <!-- Vite Assets -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -83,11 +82,11 @@
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </form>
-                    <a href="{{ env('MAIN_SITE_URL') }}/dashboard" 
+                    {{-- <a href="{{ env('MAIN_SITE_URL') }}/dashboard" 
                     class="btn btn-outline-primary" 
                     style="margin-left: 0.5rem;">
                         <i class="fas fa-arrow-left"></i> Back to Main Site
-                    </a>
+                    </a> --}}
                 </div>
             </div>
         </header>

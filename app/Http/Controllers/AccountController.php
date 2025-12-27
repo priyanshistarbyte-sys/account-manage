@@ -22,6 +22,15 @@ class AccountController extends Controller
                 ->addColumn('category', function ($account) {
                     return $account->category_name ? $account->category_name->name : '-';
                 })
+                ->addColumn('password', function ($account) {
+                    $viewUrl = route('account.view-password', $account->id);
+                    return '<span class="password-mask">••••••••</span>
+                            <a href="#" class="btn btn-sm ms-2" 
+                            data-ajax-popup="true" data-size="md"
+                            data-title="View Password" data-url="'.$viewUrl.'">
+                                <i class="fa fa-eye"></i>
+                            </a>';
+                })
                 ->addColumn('actions', function ($account) {
                      $buttons = '';
                      $editUrl = route('account.edit', $account->id);
@@ -44,7 +53,7 @@ class AccountController extends Controller
                        
                         return $buttons;
                 })
-                ->rawColumns(['category','actions'])
+                ->rawColumns(['category','password','actions'])
                 ->make(true);
         }
 
@@ -137,5 +146,13 @@ class AccountController extends Controller
     {
         $account->delete();
         return redirect()->route('account.index')->with('success', 'Account deleted successfully.');
+    }
+
+    /**
+     * Show password in popup.
+     */
+    public function viewPassword(Account $account)
+    {
+        return view('account.view-password', compact('account'));
     }
 }

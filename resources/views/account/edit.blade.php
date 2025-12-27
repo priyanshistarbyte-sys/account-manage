@@ -18,7 +18,12 @@
             </div>
              <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" id="password" value="{{ old('password', $account->password) }}" class="form-control" placeholder="Enter Password" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" value="{{ old('password', $account->password) }}" class="form-control" placeholder="Enter Password" required>
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="fa fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
             </div>
             <div class="mb-3">
                 <label for="note" class="form-label">Note</label>
@@ -31,3 +36,20 @@
         <button class="btn btn-primary" type="submit">{{__('Update')}}</button>
     </div>
 </form>
+
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordField = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+});
+</script>
