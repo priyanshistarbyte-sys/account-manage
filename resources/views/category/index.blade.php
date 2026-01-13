@@ -21,7 +21,7 @@
             <table class="table" id="category-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Name</th>
                         <th>Actions</th>
                     </tr>
@@ -41,7 +41,7 @@
             serverSide: true,
             ajax: '{{ route('category.index') }}',
             columns: [
-                {data: 'id', name: 'id'},
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
             ]

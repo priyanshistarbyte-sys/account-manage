@@ -45,16 +45,24 @@
                     Dashboard
                 </a>
             </div>
-          
-             <div class="nav-item">
+           
+            <div class="nav-item">
                 <a href="{{ route('category.index') }}" class="nav-link {{ request()->routeIs('category.*') ? 'active' : '' }}">
                     <i class="fas fa-building nav-icon"></i>
                     Category
                 </a>
             </div>
+
+            <div class="nav-item">
+                <a href="{{ route('user.index') }}" class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}">
+                    <i class="fas fa-user nav-icon"></i>
+                    User
+                </a>
+            </div>
+            
             <div class="nav-item">
                 <a href="{{ route('account.index') }}" class="nav-link {{ request()->routeIs('account.*') ? 'active' : '' }}">
-                    <i class="fas fa-users nav-icon"></i>
+                    <i class="fas fa-briefcase nav-icon"></i>
                     Account
                 </a>
             </div>
@@ -75,18 +83,21 @@
             </div>
             <div class="header-actions">
                 <div class="dropdown">
-                    <span>{{ Auth::user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
-                        @csrf
-                        <button type="submit" class="btn btn-secondary" style="margin-left: 1rem;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </form>
-                    {{-- <a href="{{ env('MAIN_SITE_URL') }}/dashboard" 
-                    class="btn btn-outline-primary" 
-                    style="margin-left: 0.5rem;">
-                        <i class="fas fa-arrow-left"></i> Back to Main Site
-                    </a> --}}
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> {{ Auth::user()->name }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fas fa-user-circle"></i> Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>

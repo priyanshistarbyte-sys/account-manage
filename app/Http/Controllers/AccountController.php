@@ -16,45 +16,135 @@ class AccountController extends Controller
      */
     public function index(Request $request)
     {
-         if ($request->ajax()) {
-            $query = Account::with(['category_name'])->orderBy('id', 'desc');
-            return DataTables::of($query)
-                ->addColumn('category', function ($account) {
-                    return $account->category_name ? $account->category_name->name : '-';
-                })
-                ->addColumn('password', function ($account) {
-                    $viewUrl = route('account.view-password', $account->id);
-                    return '<span class="password-mask">••••••••</span>
-                            <a href="#" class="btn btn-sm ms-2" 
-                            data-ajax-popup="true" data-size="md"
-                            data-title="View Password" data-url="'.$viewUrl.'">
-                                <i class="fa fa-eye"></i>
-                            </a>';
-                })
-                ->addColumn('actions', function ($account) {
-                     $buttons = '';
-                     $editUrl = route('account.edit', $account->id);
-                     $buttons .= '
-                            <a href="#" class="btn btn-sm btn-secondary me-2" 
-                            data-ajax-popup="true" data-size="md"
-                            data-title="Edit Account" data-url="'.$editUrl.'"
-                            data-bs-toggle="tooltip" data-bs-original-title="Edit">
-                                <i class="fa fa-edit me-2"></i>Edit
-                            </a>
-                            ';
-                     $deleteUrl = route('account.destroy', $account->id);
-                     $buttons .= '
-                            <button type="button" class="btn btn-sm btn-danger delete-btn"
-                                data-url="' . $deleteUrl . '"
-                                title="Delete">
-                                <i class="fa fa-trash me-2"></i> Delete
-                            </button>
-                            ';
-                       
-                        return $buttons;
-                })
-                ->rawColumns(['category','password','actions'])
-                ->make(true);
+        if(Auth::user()->role == 'Admin')
+        {
+            if ($request->ajax()) {
+                $query = Account::with(['category_name'])->orderBy('id', 'desc');
+                return DataTables::of($query)
+                    ->addIndexColumn()
+                    ->addColumn('category', function ($account) {
+                        return $account->category_name ? $account->category_name->name : '-';
+                    })
+                    ->addColumn('password', function ($account) {
+                            return '<span class="password-display" data-password="'.$account->password.'">
+                                        <span class="password-mask">••••••••</span>
+                                        <span class="password-text" style="display:none;">'.$account->password.'</span>
+                                    </span>
+                                    <a href="#" class="btn btn-sm ms-2 toggle-password">
+                                        <i class="fa fa-eye"></i>
+                                    </a>';
+                        })
+                    ->addColumn('note', function ($account) {
+                            
+                            if (!empty($account->note)) {
+                                $url = route('account.note', $account->id);
+
+                                return '
+                                    <a href="javascript:void(0)"
+                                    class="btn tbl-btn action-btn"
+                                    data-url="'.$url.'"
+                                    data-ajax-popup="true"
+                                    data-size="md"
+                                    data-title="Note"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-original-title="View Note">
+                                        <i class="fa fa-comment"></i>
+                                    </a>
+                                ';
+                            }
+                            else{
+                                return '-';
+                            }
+                        })
+                    ->addColumn('actions', function ($account) {
+                        $buttons = '';
+                        $editUrl = route('account.edit', $account->id);
+                        $buttons .= '
+                                <a href="#" class="btn btn-sm btn-secondary me-2" 
+                                data-ajax-popup="true" data-size="md"
+                                data-title="Edit Account" data-url="'.$editUrl.'"
+                                data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                    <i class="fa fa-edit me-2"></i>Edit
+                                </a>
+                                ';
+                        $deleteUrl = route('account.destroy', $account->id);
+                        $buttons .= '
+                                <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                    data-url="' . $deleteUrl . '"
+                                    title="Delete">
+                                    <i class="fa fa-trash me-2"></i> Delete
+                                </button>
+                                ';
+                        
+                            return $buttons;
+                    })
+                    ->rawColumns(['category','password','note','actions'])
+                    ->make(true);
+            }
+        }else{
+             if ($request->ajax()) {
+                $query = Account::with(['category_name'])->where('created_by',Auth::user()->id)->orderBy('id', 'desc');
+                return DataTables::of($query)
+                    ->addIndexColumn()
+                    ->addColumn('category', function ($account) {
+                        return $account->category_name ? $account->category_name->name : '-';
+                    })
+                    ->addColumn('password', function ($account) {
+                            return '<span class="password-display" data-password="'.$account->password.'">
+                                        <span class="password-mask">••••••••</span>
+                                        <span class="password-text" style="display:none;">'.$account->password.'</span>
+                                    </span>
+                                    <a href="#" class="btn btn-sm ms-2 toggle-password">
+                                        <i class="fa fa-eye"></i>
+                                    </a>';
+                        })
+                    ->addColumn('note', function ($account) {
+                            
+                            if (!empty($account->note)) {
+                                $url = route('account.note', $account->id);
+
+                                return '
+                                    <a href="javascript:void(0)"
+                                    class="btn tbl-btn action-btn"
+                                    data-url="'.$url.'"
+                                    data-ajax-popup="true"
+                                    data-size="md"
+                                    data-title="Note"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-original-title="View Note">
+                                        <i class="fa fa-comment"></i>
+                                    </a>
+                                ';
+                            }
+                            else{
+                                return '-';
+                            }
+                        })
+                    ->addColumn('actions', function ($account) {
+                        $buttons = '';
+                        $editUrl = route('account.edit', $account->id);
+                        $buttons .= '
+                                <a href="#" class="btn btn-sm btn-secondary me-2" 
+                                data-ajax-popup="true" data-size="md"
+                                data-title="Edit Account" data-url="'.$editUrl.'"
+                                data-bs-toggle="tooltip" data-bs-original-title="Edit">
+                                    <i class="fa fa-edit me-2"></i>Edit
+                                </a>
+                                ';
+                        $deleteUrl = route('account.destroy', $account->id);
+                        $buttons .= '
+                                <button type="button" class="btn btn-sm btn-danger delete-btn"
+                                    data-url="' . $deleteUrl . '"
+                                    title="Delete">
+                                    <i class="fa fa-trash me-2"></i> Delete
+                                </button>
+                                ';
+                        
+                            return $buttons;
+                    })
+                    ->rawColumns(['category','password','note','actions'])
+                    ->make(true);
+            }
         }
 
         return view('account.index');
@@ -65,7 +155,13 @@ class AccountController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('created_by', Auth::user()->id)->get();
+        if(Auth::user()->role == 'Admin')
+        {
+            $categories = Category::get();
+        }else{
+            $categories = Category::where('created_by',Auth::user()->id)->get();
+        }
+        
         return view('account.create',compact('categories'));
     }
 
@@ -110,7 +206,13 @@ class AccountController extends Controller
      */
     public function edit(Account $account)
     {
-        $categories = Category::where('created_by', Auth::user()->id)->get();
+        if(Auth::user()->role == 'Admin')
+        {
+            $categories = Category::get();
+        }else{
+            $categories = Category::where('created_by',Auth::user()->id)->get();
+        }
+        
         return view('account.edit', compact('account','categories'));
 
     }
@@ -154,5 +256,11 @@ class AccountController extends Controller
     public function viewPassword(Account $account)
     {
         return view('account.view-password', compact('account'));
+    }
+
+    public function note($id)
+    {
+        $account = Account::findOrFail($id);
+        return view('account.note', compact('account'));
     }
 }

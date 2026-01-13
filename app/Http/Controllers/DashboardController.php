@@ -3,17 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Category;
+use App\Models\Account;
 use Illuminate\Http\Request;
 use Lab404\Impersonate\Impersonate;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $categoryCount = \App\Models\Category::count();
-        $accountCount = \App\Models\Account::count();
+        if(Auth::user()->role == 'Admin')
+        {
+            $categoryCount = Category::count();
+            $accountCount  = Account::count();
+            $userCount     = User::where('id','!=',Auth::user()->id)->count();
+            $categories    = Category::get();
+        }else{
+            $categoryCount = Category::where('created_by',Auth::user()->id)->count();
+            $accountCount  = Account::where('created_by',Auth::user()->id)->count();
+            $userCount     = User::where('created_by',Auth::user()->id)->count();
+            $categories    = Category::where('created_by',Auth::user()->id)->get();
+        }
+        
+        return view('dashboard', compact('categoryCount', 'accountCount','userCount', 'categories'));
+    }
 
-        return view('dashboard', compact('categoryCount', 'accountCount'));
+    public function getCategoryAccounts($categoryId)
+    {
+        $accounts = Account::where('category', $categoryId)
+                    ->where('created_by', Auth::user()->id)
+                    ->select('email', 'password','note')
+                    ->get();
+        return view('category_account', compact('accounts'));
     }
 
 

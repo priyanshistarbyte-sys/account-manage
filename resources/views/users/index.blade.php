@@ -1,31 +1,29 @@
 @extends('layouts.main')
 
-@section('page-title', 'Account')
+@section('page-title', 'User')
 
 @section('content')
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0"></h5>
             <a href="#" class="btn btn-sm btn btn-success btn-icon action-btn"  data-ajax-popup="true" data-size="md"
-                            data-title="{{ __('Create Account') }}" data-url="{{ route('account.create') }}"
+                            data-title="{{ __('Create User') }}" data-url="{{ route('user.create') }}"
                             data-bs-toggle="tooltip" data-bs-original-title="{{ __('Create') }}">Add New</a>
     </div>
 </div>
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">All Account</h3>
+        <h3 class="card-title">All User</h3>
     </div>
     <div class="card-body">
         <div class="table-container">
-            <table class="table" id="account-table">
+            <table class="table" id="user-table">
                 <thead>
                     <tr>
-                        <th width="10%">No</th>
-                        <th width="20%">Email</th>
-                        <th width="20%">Password</th>
-                        <th width="20%">Category</th>
-                        <th width="10%">Note</th>
-                        <th width="20%">Actions</th>
+                        <th width="25%">No</th>
+                        <th width="25%">Name</th>
+                        <th width="25%">Email</th>
+                        <th width="25%">Actions</th>
                     </tr>
                 </thead>
             </table>
@@ -38,16 +36,14 @@
 <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
 <script>
     $(document).ready(function() {
-        $('#account-table').DataTable({
+        $('#user-table').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '{{ route('account.index') }}',
+            ajax: '{{ route('user.index') }}',
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'name', name: 'name'},
                 { data: 'email', name: 'email' },
-                { data: 'password', name: 'password' },
-                { data: 'category', name: 'category' },
-                { data: 'note', name: 'note', orderable: false, searchable: false },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
             ]
         });
@@ -87,23 +83,7 @@
             });
         });
 
-        $(document).on('click', '.toggle-password', function(e) {
-            e.preventDefault();
-            const passwordDisplay = $(this).siblings('.password-display');
-            const passwordMask = passwordDisplay.find('.password-mask');
-            const passwordText = passwordDisplay.find('.password-text');
-            const icon = $(this).find('i');
-            
-            if (passwordMask.is(':visible')) {
-                passwordMask.hide();
-                passwordText.show();
-                icon.removeClass('fa-eye').addClass('fa-eye-slash');
-            } else {
-                passwordMask.show();
-                passwordText.hide();
-                icon.removeClass('fa-eye-slash').addClass('fa-eye');
-            }
-        });
+        
     });
 </script>
 @endpush

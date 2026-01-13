@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,11 +17,15 @@ Route::get('users/{id}/login-with-account', [DashboardController::class, 'loginW
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/category/{categoryId}/accounts', [DashboardController::class, 'getCategoryAccounts'])->name('dashboard.category.accounts');
     // category
     Route::resource('category', CategoryController::class);
+    // account
     Route::resource('account', AccountController::class);
     Route::get('account/{account}/view-password', [AccountController::class, 'viewPassword'])->name('account.view-password');
-
+    Route::get('/account/{id}/note', [AccountController::class, 'note'])->name('account.note');
+    // user
+    Route::resource('user', UserController::class);
 });
 
 Route::middleware('auth')->group(function () {

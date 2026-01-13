@@ -2,38 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Account;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Account;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Crypt;
 
-class CategoryController extends Controller
+
+class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         if(Auth::user()->role == 'Admin')
         {
-             if ($request->ajax()) {
-                $query = Category::orderBy('id', 'desc');
+            if ($request->ajax()) {
+                $query = User::where('id','!=',Auth::user()->id)->orderBy('id', 'desc');
                 return DataTables::of($query)
                     ->addIndexColumn()
-                    ->addColumn('actions', function ($category) {
+                    ->addColumn('actions', function ($user) {
                         $buttons = '';
-                        $editUrl = route('category.edit', $category->id);
+                        $editUrl = route('user.edit', $user->id);
                         $buttons .= '
                                 <a href="#" class="btn btn-sm btn-secondary me-2" 
                                 data-ajax-popup="true" data-size="md"
-                                data-title="Edit Category" data-url="'.$editUrl.'"
+                                data-title="Edit User" data-url="'.$editUrl.'"
                                 data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                     <i class="fa fa-edit me-2"></i>Edit
                                 </a>
                                 ';
-                        $deleteUrl = route('category.destroy', $category->id);
+                        $deleteUrl = route('user.destroy', $user->id);
                         $buttons .= '
                                 <button type="button" class="btn btn-sm btn-danger delete-btn"
                                     data-url="' . $deleteUrl . '"
@@ -47,23 +47,23 @@ class CategoryController extends Controller
                     ->rawColumns(['actions'])
                     ->make(true);
             }
-        }else{
+        } else{
             if ($request->ajax()) {
-                $query = Category::where('created_by',Auth::user()->id)->orderBy('id', 'desc');
-                return DataTables::of($query)
+            $query = User::where('created_by',Auth::user()->id)->orderBy('id', 'desc');
+            return DataTables::of($query)
                     ->addIndexColumn()
-                    ->addColumn('actions', function ($category) {
+                    ->addColumn('actions', function ($user) {
                         $buttons = '';
-                        $editUrl = route('category.edit', $category->id);
+                        $editUrl = route('user.edit', $user->id);
                         $buttons .= '
                                 <a href="#" class="btn btn-sm btn-secondary me-2" 
                                 data-ajax-popup="true" data-size="md"
-                                data-title="Edit Category" data-url="'.$editUrl.'"
+                                data-title="Edit User" data-url="'.$editUrl.'"
                                 data-bs-toggle="tooltip" data-bs-original-title="Edit">
                                     <i class="fa fa-edit me-2"></i>Edit
                                 </a>
                                 ';
-                        $deleteUrl = route('category.destroy', $category->id);
+                        $deleteUrl = route('user.destroy', $user->id);
                         $buttons .= '
                                 <button type="button" class="btn btn-sm btn-danger delete-btn"
                                     data-url="' . $deleteUrl . '"
@@ -78,86 +78,73 @@ class CategoryController extends Controller
                     ->make(true);
             }
         }
-      
 
-        return view('category.index');
+        return view('users.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-       return view('category.create');
+        return view('users.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+       
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'string'],
         ]);
 
         if ($validator->fails()) {
             $messages = $validator->getMessageBag();
             return redirect()->back()->with('error', $messages->first());
         }
-        $category = new Category();
-        $category->name = $request->name;
-        $category->created_by = Auth::user()->id;
-        $category->save();
+        $user             = new User();
+        $user->name       = $request->name;
+        $user->email      = $request->email;
+        $user->password   = $request->password;
+        $user->role       = 'User';
+        $user->created_by = Auth::user()->id;
+        $user->save();
 
-        return redirect()->route('category.index')->with('success', 'Category created successfully.');
+        return redirect()->route('user.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function show(User $User)
     {
         return redirect()->back();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
+    public function edit(User $user)
     {
-         return view('category.edit', compact('category'));
+        return view('users.edit', compact('user'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, User $user)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            ]);
+         $validator = Validator::make($request->all(), [
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class.',email,'.$user->id],
+            'password' => ['nullable', 'string'],
+        ]);
 
         if ($validator->fails()) {
             $messages = $validator->getMessageBag();
             return redirect()->back()->with('error', $messages->first());
         }
-        $category->name = $request->name;
-        $category->save();
-        return redirect()->route('category.index')->with('success', 'Category updated successfully.');
+        $user->name       = $request->name;
+        $user->email      = $request->email;
+        if ($request->filled('password')) {
+            $user->password = $request->password;
+        }
+        $user->save();
+        return redirect()->route('user.index')->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $category = Category::findOrFail($id);
-        $account  = Account::where('category', $category->id)->count();
-        if ($account == 0) {
-            $category->delete();
-            return redirect()->route('category.index')->with('success', 'Category deleted successfully.');
-        } else {
-            return redirect()->back()->with('error', 'This Category is used in one or more Sub Category.');
-         }
+        $user->delete();
+        return redirect()->route('user.index')->with('success', 'User deleted successfully.');
     }
+
+
 }
